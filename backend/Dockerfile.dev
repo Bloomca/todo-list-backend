@@ -7,4 +7,6 @@ WORKDIR /usr/src/app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+RUN npm install
+
+CMD npm run dev & sleep 1 && npm run test:integration && wait

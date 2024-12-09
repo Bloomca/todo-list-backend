@@ -14,4 +14,4 @@ const dbConfig: mysql.PoolOptions = {
 };
 
 // Create a connection pool
-const pool = mysql.createPool(dbConfig);
+export const pool = mysql.createPool(dbConfig);
