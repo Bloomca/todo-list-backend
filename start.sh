@@ -12,3 +12,9 @@ docker compose -f compose.yml -f compose.dev.yml up
 
 # If you also want to remove the volumes (this will delete all your database data):
 # docker compose down -v
+
+# To connect to the database:
+# docker compose exec mysql mysql -u user -ppassword myapp
+
+# docker compose -f compose.yml -f compose.test.yml up --build --exit-code-from test
+# docker compose -f compose.yml -f compose.test.yml up --exit-code-from test

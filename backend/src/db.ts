@@ -3,7 +3,7 @@ import mysql from "mysql2/promise";
 // Connection configuration
 const dbConfig: mysql.PoolOptions = {
   host: process.env.DB_HOST,
-  user: process.env.user,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   waitForConnections: true,
@@ -14,4 +14,4 @@ const dbConfig: mysql.PoolOptions = {
 };
 
 // Create a connection pool
-const pool = mysql.createPool(dbConfig);
+export const pool = mysql.createPool(dbConfig);
