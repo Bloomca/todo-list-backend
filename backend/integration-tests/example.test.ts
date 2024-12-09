@@ -35,4 +35,29 @@ describe("sample tests", () => {
     const response = await api.get("/health");
     expect(response.statusCode).toBe(200);
   });
+
+  test("can create a new user", async () => {
+    const username = createRandomName();
+    const password = createRandomName();
+    const response = await api
+      .post("/signup")
+      .set("Content-Type", "application/json")
+      .send({ username, password })
+      .expect(201);
+
+    expect(response.body).toHaveProperty("token");
+    expect(typeof response.body.token).toBe("string");
+  });
 });
+
+// create 16 random characters, should be good enough for unique names
+function createRandomName() {
+  const randomOffset = () => Math.floor(Math.random() * 26);
+
+  let result = "";
+  for (let i = 0; i < 16; i++) {
+    result += String.fromCharCode(97 + randomOffset());
+  }
+
+  return result;
+}

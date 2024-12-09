@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Bloomca/todo-list-backend#readme",
   "devDependencies": {
+    "@sinclair/typebox": "^0.34.11",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.10.1",
     "@types/supertest": "^6.0.2",
@@ -31,7 +32,6 @@
   },
   "dependencies": {
     "@fastify/type-provider-typebox": "^5.1.0",
-    "@sinclair/typebox": "^0.34.11",
     "bcrypt": "^5.1.1",
     "fastify": "^5.1.0",
     "ioredis": "^5.4.1",

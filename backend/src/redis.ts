@@ -12,4 +12,4 @@ const redisConfig: RedisOptions = {
 };
 
 // Create Redis client
-const redis = new Redis(redisConfig);
+export const redis = new Redis(redisConfig);
