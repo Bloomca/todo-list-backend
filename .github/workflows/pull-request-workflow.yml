@@ -1,0 +1,19 @@
+name: test-workflow
+run-name: Integration tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make script executable
+        run: chmod +x ./start.sh
+
+      - name: Run tests
+        run: ./start.sh test
