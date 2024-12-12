@@ -5,3 +5,6 @@ export const CreateUserResponseSchema = Type.Object({
 });
 
 export type CreateUserResponse = Static<typeof CreateUserResponseSchema>;
+
+export const loginUserResponseSchema = CreateUserResponseSchema;
+export type loginUserResponse = CreateUserResponse;

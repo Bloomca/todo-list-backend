@@ -30,3 +30,4 @@ If you want to develop it locally, you should install dependencies in the `backe
 
 - GET `/health` -- simple health check
 - POST `/signup` -- expects JSON body with `username` and `password`, registers a user and returns a session token
+- POST `/login` -- expects JSON body with `username` and `password`, logs in a user and returns a session token

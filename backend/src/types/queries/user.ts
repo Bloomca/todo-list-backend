@@ -6,3 +6,6 @@ export const CreateUserQuerySchema = Type.Object({
 });
 
 export type CreateUserQuery = Static<typeof CreateUserQuerySchema>;
+
+export const loginUserQuerySchema = CreateUserQuerySchema;
+export type loginUserQuery = CreateUserQuery;

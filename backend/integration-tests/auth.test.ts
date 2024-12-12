@@ -30,13 +30,13 @@ beforeAll(async () => {
   }
 });
 
-describe("sample tests", () => {
+describe("auth tests", () => {
   test("health check", async () => {
     const response = await api.get("/health");
     expect(response.statusCode).toBe(200);
   });
 
-  test("can create a new user", async () => {
+  test("can create a new user and log in", async () => {
     const username = createRandomName();
     const password = createRandomName();
     const response = await api
@@ -47,6 +47,15 @@ describe("sample tests", () => {
 
     expect(response.body).toHaveProperty("token");
     expect(typeof response.body.token).toBe("string");
+
+    const loginResponse = await api
+      .post("/login")
+      .set("Content-Type", "application/json")
+      .send({ username, password })
+      .expect(200);
+
+    expect(loginResponse.body).toHaveProperty("token");
+    expect(typeof loginResponse.body.token).toBe("string");
   });
 });
 
