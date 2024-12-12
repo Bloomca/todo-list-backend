@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 
 import { addUserRoutes } from "./routes/user";
+import { addErrorHandlers } from "./errors/server-errors";
 
 export async function startServer() {
   const fastify = Fastify({ logger: true });
@@ -10,6 +11,7 @@ export async function startServer() {
   });
 
   addUserRoutes(fastify);
+  addErrorHandlers(fastify);
 
   try {
     await fastify.listen({

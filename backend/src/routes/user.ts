@@ -1,17 +1,22 @@
 import { type FastifyInstance } from "fastify";
 
-import { signup } from "../services/auth/index";
+import { signup, login } from "../services/auth";
 import {
   CreateUserQuerySchema,
+  loginUserQuerySchema,
   type CreateUserQuery,
+  type loginUserQuery,
 } from "../types/queries/user";
 import {
   CreateUserResponseSchema,
+  loginUserResponseSchema,
   type CreateUserResponse,
+  type loginUserResponse,
 } from "../types/responses/user";
 
 export function addUserRoutes(fastify: FastifyInstance) {
   addCreateUserRoute(fastify);
+  aadLoginUserRoute(fastify);
 }
 
 function addCreateUserRoute(fastify: FastifyInstance) {
@@ -29,13 +34,29 @@ function addCreateUserRoute(fastify: FastifyInstance) {
       },
     },
     async function handler(request, reply) {
-      try {
-        const token = await signup(request.body);
-        reply.code(201).send({ token });
-      } catch (e) {
-        console.error("error during signing up:", e);
-        reply.status(500);
-      }
+      const token = await signup(request.body);
+      reply.code(201).send({ token });
+    }
+  );
+}
+
+function aadLoginUserRoute(fastify: FastifyInstance) {
+  fastify.post<{
+    Body: loginUserQuery;
+    Reply: loginUserResponse;
+  }>(
+    "/login",
+    {
+      schema: {
+        body: loginUserQuerySchema,
+        response: {
+          200: loginUserResponseSchema,
+        },
+      },
+    },
+    async function handler(request, reply) {
+      const token = await login(request.body);
+      reply.code(200).send({ token });
     }
   );
 }
