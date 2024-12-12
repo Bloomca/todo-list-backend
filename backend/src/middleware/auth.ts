@@ -18,6 +18,11 @@ export async function checkAuthentication(request: FastifyRequest) {
     throw new AuthError("Your token is invalid or expired.");
   }
 
-  // @ts-expect-error all other handlers will use correct request type
+  // @ts-expect-error not sure how to type it properly
   request.userId = userId;
+}
+
+export function getUserIdFromRequest(request: FastifyRequest) {
+  // @ts-expect-error not sure how to type it properly
+  return request.userId as number;
 }

@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance } from "fastify";
 
 import { checkAuthentication } from "./middleware/auth";
 import { addUserRoutes } from "./routes/user";
+import { addProjectRoutes } from "./routes/project";
 import { addErrorHandlers } from "./errors/server-errors";
 
 export async function startServer() {
@@ -21,6 +22,7 @@ export async function startServer() {
   fastify.register(function createScopedServer(scopedFastify: FastifyInstance) {
     // Add the middleware to all routes in this context
     scopedFastify.addHook("preHandler", checkAuthentication);
+    addProjectRoutes(scopedFastify);
   });
 
   try {
