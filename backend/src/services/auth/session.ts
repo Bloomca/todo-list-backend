@@ -15,3 +15,15 @@ export async function createSession(userId: number, rememberMe = false) {
 
   return token;
 }
+
+export async function getSessionUserId(token: string): Promise<null | number> {
+  const sessionData = await redis.get(`session:${token}`);
+
+  // Session not found or expired
+  if (!sessionData) {
+    return null;
+  }
+
+  const { userId } = JSON.parse(sessionData) as { userId: number };
+  return userId;
+}
