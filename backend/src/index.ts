@@ -1,8 +1,5 @@
+import { applyMigrations } from "./migrations";
 import { startServer } from "./server";
-
-async function applyMigrations() {
-  // pass
-}
 
 async function main() {
   await applyMigrations();
