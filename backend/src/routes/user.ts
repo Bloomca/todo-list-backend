@@ -15,11 +15,11 @@ import {
 } from "../types/responses/user";
 
 export function addUserRoutes(fastify: FastifyInstance) {
-  addCreateUserRoute(fastify);
+  addSignupUserRoute(fastify);
   aadLoginUserRoute(fastify);
 }
 
-function addCreateUserRoute(fastify: FastifyInstance) {
+function addSignupUserRoute(fastify: FastifyInstance) {
   fastify.post<{
     Body: CreateUserQuery;
     Reply: CreateUserResponse;
