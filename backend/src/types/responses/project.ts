@@ -1,12 +1,11 @@
 import { Type, Static } from "@sinclair/typebox";
+import { ProjectSchema, type Project } from "../entities/project";
 
-export const CreateProjectResponseSchema = Type.Object({
-  id: Type.Number(),
-  name: Type.String(),
-  description: Type.Optional(Type.String()),
-  is_archived: Type.Boolean(),
-  created_at: Type.String(),
-  creator_id: Type.Number(),
-});
+export const CreateProjectResponseSchema = ProjectSchema;
+export type CreateProjectResponse = Project;
 
-export type CreateProjectResponse = Static<typeof CreateProjectResponseSchema>;
+export const GetProjectsResponseSchema = Type.Array(ProjectSchema);
+export type GetProjectsResponse = Static<typeof GetProjectsResponseSchema>;
+
+export const GetProjectResponseSchema = ProjectSchema;
+export type GetProjectResponse = Project;

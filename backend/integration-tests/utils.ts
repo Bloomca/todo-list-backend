@@ -29,3 +29,9 @@ function createRandomName() {
 
   return result;
 }
+
+export function logMessage(message: string) {
+  console.log("");
+  console.log("==========================");
+  console.log(message);
+}

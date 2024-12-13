@@ -1,10 +1,10 @@
-import { AuthError } from "./errors";
+import { AppError } from "./errors";
 
 import type { FastifyInstance } from "fastify";
 
 export function addErrorHandlers(fastify: FastifyInstance) {
   fastify.setErrorHandler((error, request, reply) => {
-    if (error instanceof AuthError) {
+    if (error instanceof AppError) {
       return reply.status(error.statusCode).send({ error: error.message });
     }
 
