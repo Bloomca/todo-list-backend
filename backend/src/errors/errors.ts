@@ -21,3 +21,9 @@ export class NotFoundError extends AppError {
     super(404, message);
   }
 }
+
+export class BadRequestError extends AppError {
+  constructor(message: string = "Invalid request body") {
+    super(400, message);
+  }
+}

@@ -9,4 +9,11 @@ export const ProjectSchema = Type.Object({
   creator_id: Type.Number(),
 });
 
+export const ProjectUpdatesSchema = Type.Object({
+  name: Type.Optional(Type.String()),
+  description: Type.Optional(Type.Optional(Type.String())),
+  is_archived: Type.Optional(Type.Boolean()),
+});
+
 export type Project = Static<typeof ProjectSchema>;
+export type ProjectUpdates = Static<typeof ProjectUpdatesSchema>;
