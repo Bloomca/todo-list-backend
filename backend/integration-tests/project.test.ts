@@ -44,6 +44,26 @@ describe("project tests", () => {
       .get(`/projects/${project3.id}`)
       .set("Authorization", `Bearer ${token}`)
       .expect(404);
+
+    logMessage("can update projects");
+    await api
+      .put(`/projects/${project2.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .set("Content-Type", "application/json")
+      .send({
+        name: "Updated project name",
+        description: "New description",
+        is_archived: true,
+      })
+      .expect(204);
+
+    const updatedProjectResponse = await api
+      .get(`/projects/${project2.id}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(updatedProjectResponse.body.name).toBe("Updated project name");
+    expect(updatedProjectResponse.body.description).toBe("New description");
+    expect(updatedProjectResponse.body.is_archived).toBe(true);
   });
 });
 
