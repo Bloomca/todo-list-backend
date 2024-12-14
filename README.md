@@ -31,3 +31,13 @@ If you want to develop it locally, you should install dependencies in the `backe
 - GET `/health` -- simple health check
 - POST `/signup` -- expects JSON body with `username` and `password`, registers a user and returns a session token
 - POST `/login` -- expects JSON body with `username` and `password`, logs in a user and returns a session token
+
+All other endpoints require `Authorization: Bearer <TOKEN>` header.
+
+**Projects**
+
+- POST `/projects` -- create a project. Accepts `name` and `description` fields
+- GET `/projects` -- receive all user's projects
+- GET `/projects/:projectID` -- fetch a project by ID. Only projects created by the user (from the token) can be fetched
+- PUT `/projects/:projectID` -- update a project. Accepts `name`, `description` and `is_archived` fields. At least one field is required
+- DELETE `projects/:projectID` -- delete a project
