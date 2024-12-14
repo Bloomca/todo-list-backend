@@ -48,7 +48,14 @@ export async function _applyMigrations() {
     return;
   }
 
-  for (const fileName of newMigrations) {
+  /**
+   * `readdir` does not guarantee any order, so we need to sort manually
+   * to ensure they are applied in the right order. Due to the timestamp
+   * format, it should be enough to use simple `.sort()` call.
+   */
+  const sortedMigrations = newMigrations.sort();
+
+  for (const fileName of sortedMigrations) {
     console.log();
     const nameWithoutExtension = fileName.slice(0, -4);
     console.log("applying migration: ", nameWithoutExtension);
