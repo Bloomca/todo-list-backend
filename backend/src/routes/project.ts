@@ -4,7 +4,10 @@ import { Type, Static } from "@sinclair/typebox";
 import { deleteProjectWithData } from "../services/project";
 import { getUserIdFromRequest } from "../middleware/auth";
 import { NotFoundError, BadRequestError } from "../errors/errors";
-import { getProjectAndVerify } from "../services/project/index";
+import {
+  getProjectAndVerify,
+  updateProjectWithData,
+} from "../services/project/index";
 import {
   createProjectInDB,
   getUserProjects,
@@ -151,14 +154,12 @@ function addProjectUpdateRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const userId = getUserIdFromRequest(request);
       const projectId = request.params.projectId;
-      await getProjectAndVerify(projectId, userId);
-
+      const project = await getProjectAndVerify(projectId, userId);
       const isEmpty = Object.keys(request.body).length === 0;
       if (isEmpty) {
         throw new BadRequestError("No updated project fields");
       }
-
-      const wasUpdated = await updateProject(projectId, request.body);
+      const wasUpdated = await updateProjectWithData(project, request.body);
 
       if (!wasUpdated) {
         // this should be handled earlier, so just to be safe

@@ -93,3 +93,13 @@ export async function updateTask(
 
   return result.affectedRows !== 0;
 }
+
+export async function archiveProjectTasks(
+  projectId: number,
+  trx?: PoolConnection
+) {
+  await (trx ?? pool).execute(
+    "UPDATE tasks SET is_archived=? WHERE project_id=?",
+    [true, projectId]
+  );
+}
