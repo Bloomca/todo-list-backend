@@ -3,6 +3,8 @@ import request from "supertest";
 
 import { createProject, registerUser, logMessage } from "./utils";
 
+import type { Task } from "../src/types/entities/task";
+
 const api = request("http://localhost:3000");
 
 describe("tasks tests", () => {
@@ -10,16 +12,55 @@ describe("tasks tests", () => {
     const token = await registerUser(api);
     const project = await createProject(api, token, "books");
 
-    logMessage("creating a new task");
-    const response = await api
-      .post("/tasks")
-      .set("Authorization", `Bearer ${token}`)
-      .set("Content-Type", "application/json")
-      .send({ project_id: project.id, name: "First task" })
-      .expect(201);
+    logMessage("creating new tasks");
+    const task1 = await createTask({
+      token,
+      projectId: project.id,
+      taskName: "First task",
+    });
 
-    expect(response.body.name).toBe("First task");
-    expect(response.body.project_id).toBe(project.id);
-    expect(response.body.section_id).toBe(null);
+    expect(task1.name).toBe("First task");
+    expect(task1.project_id).toBe(project.id);
+    expect(task1.section_id).toBe(null);
+
+    const task2 = await createTask({
+      token,
+      projectId: project.id,
+      taskName: "Second task",
+    });
+
+    expect(task2.name).toBe("Second task");
+    expect(task2.project_id).toBe(project.id);
+    expect(task2.section_id).toBe(null);
+
+    logMessage("getting all tasks");
+    const allTasksResponse = await api
+      .get("/tasks")
+      .query({ project_id: project.id })
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200);
+
+    expect(allTasksResponse.body.length).toBe(2);
+    expect(allTasksResponse.body).toContainEqual(task1);
+    expect(allTasksResponse.body).toContainEqual(task2);
   });
 });
+
+async function createTask({
+  token,
+  projectId,
+  taskName,
+}: {
+  token: string;
+  projectId: number;
+  taskName: string;
+}) {
+  const response = await api
+    .post("/tasks")
+    .set("Authorization", `Bearer ${token}`)
+    .set("Content-Type", "application/json")
+    .send({ project_id: projectId, name: taskName })
+    .expect(201);
+
+  return response.body as Task;
+}

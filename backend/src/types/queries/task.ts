@@ -8,3 +8,9 @@ export const CreateTaskQuerySchema = Type.Object({
 });
 
 export type CreateTaskQuery = Static<typeof CreateTaskQuerySchema>;
+
+export const GetTasksQuerySchema = Type.Object({
+  project_id: Type.Number(),
+});
+
+export type GetTasksQuery = Static<typeof GetTasksQuerySchema>;
