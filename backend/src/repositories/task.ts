@@ -33,3 +33,12 @@ export async function createTaskInDB({
 
   return tasks[0] as Task;
 }
+
+export async function getProjectTasks(projectId: number) {
+  const [tasks] = await pool.execute<RowDataPacket[]>(
+    "SELECT * FROM tasks WHERE project_id=?",
+    [projectId]
+  );
+
+  return tasks as Task[];
+}
