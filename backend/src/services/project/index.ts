@@ -1,8 +1,13 @@
 import { getProject } from "../../repositories/project";
 import { NotFoundError, ForbiddenError } from "../../errors/errors";
-import { deleteProjectTasks } from "../../repositories/task";
-import { deleteProject } from "../../repositories/project";
+import {
+  deleteProjectTasks,
+  archiveProjectTasks,
+} from "../../repositories/task";
+import { deleteProject, updateProject } from "../../repositories/project";
 import { executeTransaction } from "../../db";
+
+import { Project, ProjectUpdates } from "../../types/entities/project";
 
 /**
  * Delete a project and all associated entities.
@@ -14,6 +19,25 @@ export async function deleteProjectWithData(projectId: number) {
     await deleteProjectTasks(projectId, trx);
     await deleteProject(projectId, trx);
   });
+}
+
+/**
+ * Update project and correctly archive all associated entities
+ * if the project is being archived.
+ */
+export async function updateProjectWithData(
+  project: Project,
+  projectUpdates: ProjectUpdates
+): Promise<boolean> {
+  // when we are archiving a project, we need to archive its tasks
+  if (!project.is_archived && projectUpdates.is_archived === true) {
+    return executeTransaction(async function archiveProjectAndData(trx) {
+      await archiveProjectTasks(project.id, trx);
+      return updateProject(project.id, projectUpdates, trx);
+    });
+  } else {
+    return updateProject(project.id, projectUpdates);
+  }
 }
 
 /**

@@ -62,7 +62,8 @@ export async function deleteProject(
 
 export async function updateProject(
   projectId: number,
-  projectUpdates: ProjectUpdates
+  projectUpdates: ProjectUpdates,
+  trx?: PoolConnection
 ): Promise<boolean> {
   // Build the SET part of query and params array
   const setClause = Object.keys(projectUpdates)
@@ -79,7 +80,7 @@ export async function updateProject(
     WHERE id = ?
   `;
 
-  const [result] = await pool.execute<ResultSetHeader>(query, params);
+  const [result] = await (trx ?? pool).execute<ResultSetHeader>(query, params);
 
   return result.affectedRows !== 0;
 }

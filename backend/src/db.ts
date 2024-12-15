@@ -45,14 +45,15 @@ export function prepareInsertQuery(
  * transaction connection as the first argument, and all DB operations need
  * to be performed using that connection, and not general pool.
  */
-export async function executeTransaction(
-  cb: (transaction: mysql.PoolConnection) => Promise<void>
+export async function executeTransaction<T>(
+  cb: (transaction: mysql.PoolConnection) => Promise<T>
 ) {
   const connection = await pool.getConnection();
   await connection.beginTransaction();
   try {
-    await cb(connection);
+    const result = await cb(connection);
     await connection.commit();
+    return result;
   } catch (error) {
     connection.rollback();
     throw error;
