@@ -16,6 +16,10 @@ export async function createSession(userId: number, rememberMe = false) {
   return token;
 }
 
+export function destroySession(token: string) {
+  return redis.del(`session:${token}`);
+}
+
 export async function getSessionUserId(token: string): Promise<null | number> {
   const sessionData = await redis.get(`session:${token}`);
 
