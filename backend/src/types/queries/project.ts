@@ -1,5 +1,5 @@
 import { Type, Static } from "@sinclair/typebox";
-import { ProjectUpdatesSchema, Project } from "../entities/project";
+import { ProjectUpdatesSchema } from "../entities/project";
 
 export const CreateProjectQuerySchema = Type.Object({
   name: Type.String({ minLength: 3, maxLength: 255 }),

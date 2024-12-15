@@ -15,3 +15,27 @@ const dbConfig: mysql.PoolOptions = {
 
 // Create a connection pool
 export const pool = mysql.createPool(dbConfig);
+
+export function prepareInsertQuery(
+  tableName: string,
+  values: Record<string, any>
+) {
+  const { names, params } = Object.entries(values).reduce<{
+    names: string[];
+    params: string[];
+  }>(
+    (acc, [key, value]) => {
+      acc.names.push(key);
+      acc.params.push(value);
+      return acc;
+    },
+    { names: [], params: [] }
+  );
+
+  const namesClause = names.join(", ");
+  const valuesClause = names.map(() => "?").join(", ");
+
+  const query = `INSERT INTO ${tableName} (${namesClause}) VALUES (${valuesClause})`;
+
+  return { query, params };
+}

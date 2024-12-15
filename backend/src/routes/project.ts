@@ -1,4 +1,4 @@
-import { type FastifyInstance, type RouteGenericInterface } from "fastify";
+import { type FastifyInstance } from "fastify";
 import { Type, Static } from "@sinclair/typebox";
 
 import { getUserIdFromRequest } from "../middleware/auth";
