@@ -1,7 +1,7 @@
 import { expect, test, describe } from "vitest";
 import request from "supertest";
 
-import { registerUser, logMessage } from "./utils";
+import { registerUser, logMessage, createTask } from "./utils";
 
 import type { Project } from "../src/types/entities/project";
 
@@ -35,6 +35,15 @@ describe("project tests", () => {
     expect(projectResponse.body).toEqual(project2);
 
     logMessage("can delete projects");
+    /**
+     * We create a task first, so that it will be deleted as well.
+     */
+    const taskResponse = await createTask({
+      api,
+      token,
+      projectId: project3.id,
+      taskName: "first task",
+    });
     await api
       .delete(`/projects/${project3.id}`)
       .set("Authorization", `Bearer ${token}`)
@@ -42,6 +51,11 @@ describe("project tests", () => {
 
     await api
       .get(`/projects/${project3.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(404);
+
+    await api
+      .get(`/tasks/${taskResponse.id}`)
       .set("Authorization", `Bearer ${token}`)
       .expect(404);
 

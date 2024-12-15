@@ -39,3 +39,24 @@ export function prepareInsertQuery(
 
   return { query, params };
 }
+
+/**
+ * Execute callback in a single transaction. The passed callback will receive
+ * transaction connection as the first argument, and all DB operations need
+ * to be performed using that connection, and not general pool.
+ */
+export async function executeTransaction(
+  cb: (transaction: mysql.PoolConnection) => Promise<void>
+) {
+  const connection = await pool.getConnection();
+  await connection.beginTransaction();
+  try {
+    await cb(connection);
+    await connection.commit();
+  } catch (error) {
+    connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}

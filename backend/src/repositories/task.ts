@@ -1,6 +1,10 @@
 import { pool, prepareInsertQuery } from "../db";
 
-import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import type {
+  RowDataPacket,
+  ResultSetHeader,
+  PoolConnection,
+} from "mysql2/promise";
 import type { Task, TaskUpdates } from "../types/entities/task";
 
 export async function createTaskInDB({
@@ -57,7 +61,16 @@ export async function getTaskById(taskId: number): Promise<null | Task> {
 }
 
 export async function deleteTask(taskId: number): Promise<void> {
-  await pool.execute("DELETE FROM tasks where id=?", [taskId]);
+  await pool.execute("DELETE FROM tasks WHERE id=?", [taskId]);
+}
+
+export async function deleteProjectTasks(
+  projectId: number,
+  trx?: PoolConnection
+): Promise<void> {
+  await (trx || pool).execute("DELETE FROM tasks WHERE project_id=?", [
+    projectId,
+  ]);
 }
 
 export async function updateTask(
