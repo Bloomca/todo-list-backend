@@ -4,10 +4,9 @@ import { Type, Static } from "@sinclair/typebox";
 import {
   createTaskInDB,
   getProjectTasks,
-  getTaskById,
   deleteTask,
-  updateTask,
 } from "../repositories/task";
+import { getTaskAndVerify, updateTask } from "../services/task";
 import { getProject } from "../repositories/project";
 import { getUserIdFromRequest } from "../middleware/auth";
 import {
@@ -128,15 +127,7 @@ function addTaskGetRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const taskId = request.params.taskId;
       const userId = getUserIdFromRequest(request);
-      const task = await getTaskById(taskId);
-
-      if (!task) {
-        throw new NotFoundError();
-      }
-
-      if (task.creator_id !== userId) {
-        throw new ForbiddenError();
-      }
+      const task = await getTaskAndVerify(taskId, userId);
 
       reply.code(200).send(task);
     }
@@ -153,15 +144,7 @@ function addTaskDeleteRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const taskId = request.params.taskId;
       const userId = getUserIdFromRequest(request);
-      const task = await getTaskById(taskId);
-
-      if (!task) {
-        throw new NotFoundError();
-      }
-
-      if (task.creator_id !== userId) {
-        throw new ForbiddenError();
-      }
+      await getTaskAndVerify(taskId, userId);
 
       await deleteTask(taskId);
 
@@ -187,22 +170,18 @@ function addTaskUpdateRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const userId = getUserIdFromRequest(request);
       const taskId = request.params.taskId;
-      const task = await getTaskById(taskId);
-
-      if (!task) {
-        throw new NotFoundError();
-      }
-
-      if (task.creator_id !== userId) {
-        throw new ForbiddenError();
-      }
+      const task = await getTaskAndVerify(taskId, userId);
 
       const isEmpty = Object.keys(request.body).length === 0;
       if (isEmpty) {
         throw new BadRequestError("No updated task fields");
       }
 
-      const wasUpdated = await updateTask(taskId, request.body);
+      const wasUpdated = await updateTask({
+        task,
+        taskUpdates: request.body,
+        userId,
+      });
 
       if (!wasUpdated) {
         // this should be handled earlier, so just to be safe
