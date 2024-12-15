@@ -55,3 +55,7 @@ export async function getTaskById(taskId: number): Promise<null | Task> {
 
   return tasks[0] as Task;
 }
+
+export async function deleteTask(taskId: number): Promise<void> {
+  await pool.execute("DELETE FROM tasks where id=?", [taskId]);
+}

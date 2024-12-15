@@ -5,6 +5,7 @@ import {
   createTaskInDB,
   getProjectTasks,
   getTaskById,
+  deleteTask,
 } from "../repositories/task";
 import { getProject } from "../repositories/project";
 import { getUserIdFromRequest } from "../middleware/auth";
@@ -32,6 +33,7 @@ export function addTaskRoutes(fastify: FastifyInstance) {
   addTaskCreateRoute(fastify);
   addTasksGetRoute(fastify);
   addTaskGetRoute(fastify);
+  addTaskDeleteRoute(fastify);
 }
 
 function addTaskCreateRoute(fastify: FastifyInstance) {
@@ -133,6 +135,33 @@ function addTaskGetRoute(fastify: FastifyInstance) {
       }
 
       reply.code(200).send(task);
+    }
+  );
+}
+
+function addTaskDeleteRoute(fastify: FastifyInstance) {
+  fastify.delete<{
+    Params: Params;
+    Reply: { 204: null };
+  }>(
+    "/tasks/:taskId",
+    { schema: { params: ParamsSchema, response: { 204: { type: "null" } } } },
+    async function handler(request, reply) {
+      const taskId = request.params.taskId;
+      const userId = getUserIdFromRequest(request);
+      const task = await getTaskById(taskId);
+
+      if (!task) {
+        throw new NotFoundError();
+      }
+
+      if (task.creator_id !== userId) {
+        throw new ForbiddenError();
+      }
+
+      await deleteTask(taskId);
+
+      reply.code(204).send();
     }
   );
 }
