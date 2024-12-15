@@ -1,5 +1,7 @@
 import request from "supertest";
 
+import type { Project } from "../src/types/entities/project";
+
 const username = createRandomName();
 const password = createRandomName();
 
@@ -16,6 +18,21 @@ export async function registerUser(
     .expect(201);
 
   return response.body.token as string;
+}
+
+export async function createProject(
+  api: ReturnType<typeof request>,
+  token: string,
+  projectName: string
+): Promise<Project> {
+  const response = await api
+    .post("/projects")
+    .set("Authorization", `Bearer ${token}`)
+    .set("Content-Type", "application/json")
+    .send({ name: projectName })
+    .expect(201);
+
+  return response.body as Project;
 }
 
 // create 16 random characters, should be good enough for unique names
