@@ -73,7 +73,7 @@ export async function deleteProjectTasks(
   ]);
 }
 
-export async function updateTask(
+export async function updateTaskInDB(
   taskId: number,
   taskUpdates: TaskUpdates
 ): Promise<boolean> {

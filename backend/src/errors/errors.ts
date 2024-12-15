@@ -27,3 +27,11 @@ export class BadRequestError extends AppError {
     super(400, message);
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(
+    message: string = "Impossible to perform the operation due to conflicting state"
+  ) {
+    super(409, message);
+  }
+}
