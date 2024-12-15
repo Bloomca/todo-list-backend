@@ -43,6 +43,21 @@ describe("tasks tests", () => {
     expect(allTasksResponse.body.length).toBe(2);
     expect(allTasksResponse.body).toContainEqual(task1);
     expect(allTasksResponse.body).toContainEqual(task2);
+
+    logMessage("getting individual tasks");
+    const firstTaskResponse = await api
+      .get(`/tasks/${task1.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200);
+
+    expect(firstTaskResponse.body).toEqual(task1);
+
+    // const secondTaskResponse = await api
+    //   .get(`/tasks/${task2.id}`)
+    //   .set("Authorization", `Bearer ${token}`)
+    //   .expect(200);
+
+    // expect(secondTaskResponse.body).toEqual(task2);
   });
 });
 

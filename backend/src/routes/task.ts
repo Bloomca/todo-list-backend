@@ -1,9 +1,18 @@
 import { type FastifyInstance } from "fastify";
+import { Type, Static } from "@sinclair/typebox";
 
-import { createTaskInDB, getProjectTasks } from "../repositories/task";
+import {
+  createTaskInDB,
+  getProjectTasks,
+  getTaskById,
+} from "../repositories/task";
 import { getProject } from "../repositories/project";
 import { getUserIdFromRequest } from "../middleware/auth";
-import { BadRequestError } from "../errors/errors";
+import {
+  BadRequestError,
+  NotFoundError,
+  ForbiddenError,
+} from "../errors/errors";
 import {
   type CreateTaskQuery,
   CreateTaskQuerySchema,
@@ -15,11 +24,14 @@ import {
   CreateTaskResponseSchema,
   type GetTasksResponse,
   GetTasksResponseSchema,
+  type GetTaskResponse,
+  GetTaskResponseSchema,
 } from "../types/responses/task";
 
 export function addTaskRoutes(fastify: FastifyInstance) {
   addTaskCreateRoute(fastify);
   addTasksGetRoute(fastify);
+  addTaskGetRoute(fastify);
 }
 
 function addTaskCreateRoute(fastify: FastifyInstance) {
@@ -85,6 +97,42 @@ function addTasksGetRoute(fastify: FastifyInstance) {
       const tasks = await getProjectTasks(projectId);
 
       reply.code(200).send(tasks);
+    }
+  );
+}
+
+const ParamsSchema = Type.Object({
+  taskId: Type.Number(),
+});
+
+type Params = Static<typeof ParamsSchema>;
+
+function addTaskGetRoute(fastify: FastifyInstance) {
+  fastify.get<{
+    Params: Params;
+    Reply: { 200: GetTaskResponse };
+  }>(
+    "/tasks/:taskId",
+    {
+      schema: {
+        params: ParamsSchema,
+        response: { 200: GetTaskResponseSchema },
+      },
+    },
+    async function handler(request, reply) {
+      const taskId = request.params.taskId;
+      const userId = getUserIdFromRequest(request);
+      const task = await getTaskById(taskId);
+
+      if (!task) {
+        throw new NotFoundError();
+      }
+
+      if (task.creator_id !== userId) {
+        throw new ForbiddenError();
+      }
+
+      reply.code(200).send(task);
     }
   );
 }

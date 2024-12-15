@@ -6,3 +6,6 @@ export type CreateTaskResponse = Task;
 
 export const GetTasksResponseSchema = Type.Array(TaskSchema);
 export type GetTasksResponse = Static<typeof GetTasksResponseSchema>;
+
+export const GetTaskResponseSchema = TaskSchema;
+export type GetTaskResponse = Static<typeof GetTaskResponseSchema>;

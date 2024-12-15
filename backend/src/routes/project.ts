@@ -85,7 +85,6 @@ function addProjectsGetRoute(fastify: FastifyInstance) {
   );
 }
 
-// URL parameters schema
 const ParamsSchema = Type.Object({
   projectId: Type.Number(),
 });
