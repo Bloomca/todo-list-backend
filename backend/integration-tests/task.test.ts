@@ -52,12 +52,23 @@ describe("tasks tests", () => {
 
     expect(firstTaskResponse.body).toEqual(task1);
 
-    // const secondTaskResponse = await api
-    //   .get(`/tasks/${task2.id}`)
-    //   .set("Authorization", `Bearer ${token}`)
-    //   .expect(200);
+    const secondTaskResponse = await api
+      .get(`/tasks/${task2.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200);
 
-    // expect(secondTaskResponse.body).toEqual(task2);
+    expect(secondTaskResponse.body).toEqual(task2);
+
+    logMessage("can delete tasks");
+    await api
+      .delete(`/tasks/${task2.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(204);
+
+    await api
+      .get(`/tasks/${task2.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(404);
   });
 });
 
