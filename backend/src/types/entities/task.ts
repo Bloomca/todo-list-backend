@@ -13,3 +13,14 @@ export const TaskSchema = Type.Object({
 });
 
 export type Task = Static<typeof TaskSchema>;
+
+export const TaskUpdatesSchema = Type.Object({
+  project_id: Type.Optional(Type.Number()),
+  section_id: Type.Optional(Type.Union([Type.Number(), Type.Null()])),
+  name: Type.Optional(Type.String()),
+  description: Type.Optional(Type.Optional(Type.String())),
+  is_completed: Type.Optional(Type.Boolean()),
+  is_archived: Type.Optional(Type.Boolean()),
+});
+
+export type TaskUpdates = Static<typeof TaskUpdatesSchema>;

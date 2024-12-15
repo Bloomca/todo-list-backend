@@ -6,6 +6,7 @@ import {
   getProjectTasks,
   getTaskById,
   deleteTask,
+  updateTask,
 } from "../repositories/task";
 import { getProject } from "../repositories/project";
 import { getUserIdFromRequest } from "../middleware/auth";
@@ -19,6 +20,8 @@ import {
   CreateTaskQuerySchema,
   type GetTasksQuery,
   GetTasksQuerySchema,
+  type UpdateTaskQuery,
+  UpdateTaskQuerySchema,
 } from "../types/queries/task";
 import {
   type CreateTaskResponse,
@@ -34,6 +37,7 @@ export function addTaskRoutes(fastify: FastifyInstance) {
   addTasksGetRoute(fastify);
   addTaskGetRoute(fastify);
   addTaskDeleteRoute(fastify);
+  addTaskUpdateRoute(fastify);
 }
 
 function addTaskCreateRoute(fastify: FastifyInstance) {
@@ -160,6 +164,50 @@ function addTaskDeleteRoute(fastify: FastifyInstance) {
       }
 
       await deleteTask(taskId);
+
+      reply.code(204).send();
+    }
+  );
+}
+
+function addTaskUpdateRoute(fastify: FastifyInstance) {
+  fastify.put<{
+    Params: Params;
+    Body: UpdateTaskQuery;
+    Reply: { 204: null };
+  }>(
+    "/tasks/:taskId",
+    {
+      schema: {
+        params: ParamsSchema,
+        body: UpdateTaskQuerySchema,
+        response: { 204: { type: "null" } },
+      },
+    },
+    async function handler(request, reply) {
+      const userId = getUserIdFromRequest(request);
+      const taskId = request.params.taskId;
+      const task = await getTaskById(taskId);
+
+      if (!task) {
+        throw new NotFoundError();
+      }
+
+      if (task.creator_id !== userId) {
+        throw new ForbiddenError();
+      }
+
+      const isEmpty = Object.keys(request.body).length === 0;
+      if (isEmpty) {
+        throw new BadRequestError("No updated task fields");
+      }
+
+      const wasUpdated = await updateTask(taskId, request.body);
+
+      if (!wasUpdated) {
+        // this should be handled earlier, so just to be safe
+        throw new NotFoundError();
+      }
 
       reply.code(204).send();
     }

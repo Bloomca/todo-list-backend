@@ -1,4 +1,5 @@
 import { Type, Static } from "@sinclair/typebox";
+import { TaskUpdatesSchema } from "../entities/task";
 
 export const CreateTaskQuerySchema = Type.Object({
   project_id: Type.Number(),
@@ -14,3 +15,6 @@ export const GetTasksQuerySchema = Type.Object({
 });
 
 export type GetTasksQuery = Static<typeof GetTasksQuerySchema>;
+
+export const UpdateTaskQuerySchema = TaskUpdatesSchema;
+export type UpdateTaskQuery = Static<typeof UpdateTaskQuerySchema>;

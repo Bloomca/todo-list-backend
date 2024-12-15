@@ -69,6 +69,26 @@ describe("tasks tests", () => {
       .get(`/tasks/${task2.id}`)
       .set("Authorization", `Bearer ${token}`)
       .expect(404);
+
+    logMessage("can update tasks");
+    await api
+      .put(`/tasks/${task1.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .set("Content-Type", "application/json")
+      .send({
+        name: "Updated task name",
+        description: "New description",
+        is_archived: true,
+      })
+      .expect(204);
+
+    const updatedTaskResponse = await api
+      .get(`/tasks/${task1.id}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(updatedTaskResponse.body.name).toBe("Updated task name");
+    expect(updatedTaskResponse.body.description).toBe("New description");
+    expect(updatedTaskResponse.body.is_archived).toBe(true);
   });
 });
 

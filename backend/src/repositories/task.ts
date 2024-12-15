@@ -1,7 +1,7 @@
 import { pool, prepareInsertQuery } from "../db";
 
 import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import type { Task } from "../types/entities/task";
+import type { Task, TaskUpdates } from "../types/entities/task";
 
 export async function createTaskInDB({
   project_id,
@@ -58,4 +58,25 @@ export async function getTaskById(taskId: number): Promise<null | Task> {
 
 export async function deleteTask(taskId: number): Promise<void> {
   await pool.execute("DELETE FROM tasks where id=?", [taskId]);
+}
+
+export async function updateTask(
+  taskId: number,
+  taskUpdates: TaskUpdates
+): Promise<boolean> {
+  // Build the SET part of query and params array
+  const setClause = Object.keys(taskUpdates)
+    .map((key) => `${key} = ?`)
+    .join(", ");
+  const params = [...Object.values(taskUpdates).map((value) => value), taskId];
+
+  const query = `
+    UPDATE tasks 
+    SET ${setClause}
+    WHERE id = ?
+  `;
+
+  const [result] = await pool.execute<ResultSetHeader>(query, params);
+
+  return result.affectedRows !== 0;
 }

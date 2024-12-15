@@ -41,3 +41,11 @@ All other endpoints require `Authorization: Bearer <TOKEN>` header.
 - GET `/projects/:projectID` -- fetch a project by ID. Only projects created by the user (from the token) can be fetched
 - PUT `/projects/:projectID` -- update a project. Accepts `name`, `description` and `is_archived` fields. At least one field is required
 - DELETE `projects/:projectID` -- delete a project
+
+**Tasks**
+
+- POST `/tasks` -- create a new task. Accepts `project_id`, `name` and `description` fields
+- GET `/tasks?projectId=<PROJECT_ID`> -- get all project's tasks
+- GET `/tasks/:taskID` -- get an individual task by ID
+- PUT `/tasks/:taskID` -- update a task
+- DELETE `/tasks/:taskID` -- delete a task
