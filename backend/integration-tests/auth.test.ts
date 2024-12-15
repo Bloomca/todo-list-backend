@@ -1,6 +1,8 @@
 import { expect, test, describe } from "vitest";
 import request from "supertest";
 
+import { logMessage } from "./utils";
+
 const api = request("http://localhost:3000");
 
 describe("auth tests", () => {
@@ -10,6 +12,7 @@ describe("auth tests", () => {
   });
 
   test("can create a new user and log in", async () => {
+    logMessage("signing up");
     const username = createRandomName();
     const password = createRandomName();
     const response = await api
@@ -21,6 +24,7 @@ describe("auth tests", () => {
     expect(response.body).toHaveProperty("token");
     expect(typeof response.body.token).toBe("string");
 
+    logMessage("logging in");
     const loginResponse = await api
       .post("/login")
       .set("Content-Type", "application/json")
@@ -29,6 +33,17 @@ describe("auth tests", () => {
 
     expect(loginResponse.body).toHaveProperty("token");
     expect(typeof loginResponse.body.token).toBe("string");
+
+    logMessage("logging out");
+    await api
+      .post("/logout")
+      .set("Authorization", `Bearer ${loginResponse.body.token}`)
+      .expect(204);
+
+    await api
+      .get("/projects")
+      .set("Authorization", `Bearer ${loginResponse.body.token}`)
+      .expect(401);
   });
 });
 

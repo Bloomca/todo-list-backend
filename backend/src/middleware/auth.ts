@@ -4,7 +4,7 @@ import { getSessionUserId } from "../services/auth/session";
 import type { FastifyRequest } from "fastify";
 
 export async function checkAuthentication(request: FastifyRequest) {
-  const token = request.headers.authorization?.replace("Bearer ", "");
+  const token = getSessionToken(request);
 
   if (!token) {
     throw new AuthError(
@@ -20,6 +20,10 @@ export async function checkAuthentication(request: FastifyRequest) {
 
   // @ts-expect-error not sure how to type it properly
   request.userId = userId;
+}
+
+export function getSessionToken(request: FastifyRequest) {
+  return request.headers.authorization?.replace("Bearer ", "");
 }
 
 export function getUserIdFromRequest(request: FastifyRequest) {

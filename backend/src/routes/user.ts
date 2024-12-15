@@ -1,6 +1,7 @@
 import { type FastifyInstance } from "fastify";
 
-import { signup, login } from "../services/auth";
+import { signup, login, destroySession } from "../services/auth";
+import { getSessionToken } from "../middleware/auth";
 import {
   CreateUserQuerySchema,
   loginUserQuerySchema,
@@ -16,7 +17,8 @@ import {
 
 export function addUserRoutes(fastify: FastifyInstance) {
   addSignupUserRoute(fastify);
-  aadLoginUserRoute(fastify);
+  addLoginUserRoute(fastify);
+  addLogoutUserRoute(fastify);
 }
 
 function addSignupUserRoute(fastify: FastifyInstance) {
@@ -40,7 +42,7 @@ function addSignupUserRoute(fastify: FastifyInstance) {
   );
 }
 
-function aadLoginUserRoute(fastify: FastifyInstance) {
+function addLoginUserRoute(fastify: FastifyInstance) {
   fastify.post<{
     Body: loginUserQuery;
     Reply: loginUserResponse;
@@ -57,6 +59,26 @@ function aadLoginUserRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const token = await login(request.body);
       reply.code(200).send({ token });
+    }
+  );
+}
+
+function addLogoutUserRoute(fastify: FastifyInstance) {
+  fastify.post<{
+    Reply: { 204: null };
+  }>(
+    "/logout",
+    {
+      schema: {
+        response: { 204: { type: "null" } },
+      },
+    },
+    async function handler(request, reply) {
+      const token = getSessionToken(request);
+      if (token) {
+        await destroySession(token);
+      }
+      reply.code(204).send();
     }
   );
 }
