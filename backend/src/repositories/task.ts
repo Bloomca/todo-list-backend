@@ -42,3 +42,16 @@ export async function getProjectTasks(projectId: number) {
 
   return tasks as Task[];
 }
+
+export async function getTaskById(taskId: number): Promise<null | Task> {
+  const [tasks] = await pool.execute<RowDataPacket[]>(
+    "SELECT * FROM tasks WHERE id=?",
+    [taskId]
+  );
+
+  if (!tasks[0]) {
+    return null;
+  }
+
+  return tasks[0] as Task;
+}
