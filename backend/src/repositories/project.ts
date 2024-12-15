@@ -1,6 +1,10 @@
 import { pool, prepareInsertQuery } from "../db";
 
-import type { RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import type {
+  RowDataPacket,
+  ResultSetHeader,
+  PoolConnection,
+} from "mysql2/promise";
 import type { Project, ProjectUpdates } from "../types/entities/project";
 
 export async function createProjectInDB({
@@ -49,8 +53,11 @@ export async function getProject(projectId: number): Promise<null | Project> {
   return results[0] as Project;
 }
 
-export async function deleteProject(projectId: number): Promise<void> {
-  await pool.execute("DELETE FROM projects where id=?", [projectId]);
+export async function deleteProject(
+  projectId: number,
+  trx?: PoolConnection
+): Promise<void> {
+  await (trx ?? pool).execute("DELETE FROM projects where id=?", [projectId]);
 }
 
 export async function updateProject(

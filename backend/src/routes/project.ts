@@ -1,17 +1,13 @@
 import { type FastifyInstance } from "fastify";
 import { Type, Static } from "@sinclair/typebox";
 
+import { deleteProjectWithData } from "../services/project";
 import { getUserIdFromRequest } from "../middleware/auth";
-import {
-  NotFoundError,
-  ForbiddenError,
-  BadRequestError,
-} from "../errors/errors";
+import { NotFoundError, BadRequestError } from "../errors/errors";
+import { getProjectAndVerify } from "../services/project/index";
 import {
   createProjectInDB,
   getUserProjects,
-  getProject,
-  deleteProject,
   updateProject,
 } from "../repositories/project";
 import {
@@ -108,15 +104,7 @@ function addProjectGetRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const userId = getUserIdFromRequest(request);
       const projectId = request.params.projectId;
-      const project = await getProject(projectId);
-
-      if (!project) {
-        throw new NotFoundError();
-      }
-
-      if (project.creator_id !== userId) {
-        throw new ForbiddenError();
-      }
+      const project = await getProjectAndVerify(projectId, userId);
 
       reply.code(200).send(project);
     }
@@ -138,17 +126,8 @@ function addProjectDeleteRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const userId = getUserIdFromRequest(request);
       const projectId = request.params.projectId;
-      const project = await getProject(projectId);
-
-      if (!project) {
-        throw new NotFoundError();
-      }
-
-      if (project.creator_id !== userId) {
-        throw new ForbiddenError();
-      }
-
-      await deleteProject(projectId);
+      await getProjectAndVerify(projectId, userId);
+      await deleteProjectWithData(projectId);
 
       reply.code(204).send();
     }
@@ -172,15 +151,7 @@ function addProjectUpdateRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const userId = getUserIdFromRequest(request);
       const projectId = request.params.projectId;
-      const project = await getProject(projectId);
-
-      if (!project) {
-        throw new NotFoundError();
-      }
-
-      if (project.creator_id !== userId) {
-        throw new ForbiddenError();
-      }
+      await getProjectAndVerify(projectId, userId);
 
       const isEmpty = Object.keys(request.body).length === 0;
       if (isEmpty) {
