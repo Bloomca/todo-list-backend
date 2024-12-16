@@ -21,6 +21,6 @@ RUN npm install --production
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/db ./db
 
-EXPOSE 6072
+EXPOSE 3000
 
 CMD ["node", "dist/index.js"]
