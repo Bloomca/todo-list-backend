@@ -19,7 +19,8 @@ COPY package*.json ./
 RUN npm install --production
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/db ./db
 
-EXPOSE 3000
+EXPOSE 6072
 
 CMD ["node", "dist/index.js"]

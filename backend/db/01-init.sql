@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS myapp;
+CREATE DATABASE IF NOT EXISTS todo_list_backend;
 
-USE myapp;
+USE todo_list_backend;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,

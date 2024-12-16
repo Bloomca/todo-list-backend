@@ -68,7 +68,7 @@ export async function startServer() {
 
   try {
     await fastify.listen({
-      port: 3000,
+      port: getPort(),
       /**
        * Because we run this app in the Docker, we need to enable all connections.
        * By default, Fastify only allows localhost/IPv6 connections.
@@ -80,4 +80,14 @@ export async function startServer() {
     fastify.log.error(err);
     process.exit(1);
   }
+}
+
+function getPort() {
+  const envPort = Number(process.env.APP_PORT);
+
+  if (isNaN(envPort)) {
+    return 3000;
+  }
+
+  return envPort;
 }
