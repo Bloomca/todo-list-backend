@@ -31,7 +31,7 @@ export async function createSectionInDB({
   return sections[0] as Section;
 }
 
-export async function getProjectSections(projectId: number) {
+export async function getProjectSectionsFromDB(projectId: number) {
   const [sections] = await pool.execute<RowDataPacket[]>(
     "SELECT * FROM sections WHERE project_id=?",
     [projectId]
@@ -55,7 +55,7 @@ export async function getSectionById(
   return sections[0] as Section;
 }
 
-export async function deleteSection(
+export async function deleteSectionFromDB(
   sectionId: number,
   trx?: PoolConnection
 ): Promise<void> {
@@ -85,4 +85,21 @@ export async function updateSectionInDB(
   const [result] = await (trx ?? pool).execute<ResultSetHeader>(query, params);
 
   return result.affectedRows !== 0;
+}
+
+export async function deleteProjectSectionsFromDB(
+  projectId: number,
+  trx: PoolConnection
+): Promise<void> {
+  await trx.execute("DELETE FROM sections WHERE project_id=?", [projectId]);
+}
+
+export async function archiveProjectSectionsInDB(
+  projectId: number,
+  trx: PoolConnection
+) {
+  await trx.execute("UPDATE sections SET is_archived=? WHERE project_id=?", [
+    true,
+    projectId,
+  ]);
 }

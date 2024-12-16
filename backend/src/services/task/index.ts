@@ -1,5 +1,6 @@
 import { getTaskById, updateTaskInDB } from "../../repositories/task";
-import { getProject } from "../../repositories/project";
+import { getProjectFromDB } from "../../repositories/project";
+import { getSectionById } from "../../repositories/section";
 import {
   NotFoundError,
   ForbiddenError,
@@ -8,6 +9,7 @@ import {
 
 import type { Task, TaskUpdates } from "../../types/entities/task";
 import type { Project } from "../../types/entities/project";
+import type { Section } from "../../types/entities/section";
 
 /**
  * Get task by taskId, and check that:
@@ -41,20 +43,53 @@ export async function updateTask({
   userId: number;
 }) {
   let project: Project | null = null;
-  if (taskUpdates.project_id && taskUpdates.project_id !== task.project_id) {
-    project = await getProject(taskUpdates.project_id);
+  let section: Section | null = null;
+  const hasNewProjectId = taskUpdates.project_id !== task.project_id;
+  const hasNewSectionId = taskUpdates.section_id !== task.section_id;
+  if (taskUpdates.project_id && hasNewProjectId) {
+    project = await getProjectFromDB(taskUpdates.project_id);
 
     if (!project || project.creator_id !== userId) {
       throw new ConflictError("Cannot move task to the new project id");
     }
   }
+
+  if (taskUpdates.section_id && hasNewSectionId) {
+    section = await getSectionById(taskUpdates.section_id);
+
+    if (!section || section.creator_id !== userId) {
+      throw new ConflictError("Cannot move task to the new section id");
+    }
+  }
   if (taskUpdates.is_archived === false && task.is_archived === true) {
     if (!project) {
-      project = await getProject(task.project_id);
+      project = await getProjectFromDB(task.project_id);
     }
     if (project?.is_archived) {
       throw new ConflictError("Cannot unarchive task when project is archived");
     }
+
+    if (!section && taskUpdates.section_id !== null && task.section_id) {
+      section = await getSectionById(task.section_id);
+    }
+
+    if (section?.is_archived) {
+      throw new ConflictError("Cannot unarchive task when section is archived");
+    }
   }
+
+  // otherwise we'd thrown an error "NotFound", so `project` should be available
+  if (hasNewProjectId && project) {
+    if (project.is_archived) {
+      throw new ConflictError("Cannot move task to the archived project");
+    }
+  }
+
+  if (hasNewSectionId && taskUpdates.section_id !== null && section) {
+    if (section.is_archived) {
+      throw new ConflictError("Cannot move task to the archived section");
+    }
+  }
+
   return updateTaskInDB(task.id, taskUpdates);
 }

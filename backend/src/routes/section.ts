@@ -1,13 +1,13 @@
 import { type FastifyInstance } from "fastify";
 import { Type, Static } from "@sinclair/typebox";
 
-import { createSectionInDB, getProjectSections } from "../repositories/section";
 import {
   getSectionAndVerify,
+  getProjectSections,
   deleteSectionWithData,
   updateSection,
+  createSection,
 } from "../services/section";
-import { getProject } from "../repositories/project";
 import { getUserIdFromRequest } from "../middleware/auth";
 import { BadRequestError, NotFoundError } from "../errors/errors";
 import {
@@ -50,19 +50,10 @@ function addSectionCreateRoute(fastify: FastifyInstance) {
       },
     },
     async function handler(request, reply) {
-      const userId = getUserIdFromRequest(request);
-      const project = await getProject(request.body.project_id);
-
-      if (!project || project.creator_id !== userId) {
-        throw new BadRequestError(
-          "Project id either does not exist or you don't have access to it"
-        );
-      }
-
-      const section = await createSectionInDB({
-        project_id: request.body.project_id,
+      const section = await createSection({
+        userId: getUserIdFromRequest(request),
+        projectId: request.body.project_id,
         name: request.body.name,
-        userId,
       });
 
       reply.code(201).send(section);
@@ -85,15 +76,7 @@ function addSectionsGetRoute(fastify: FastifyInstance) {
     async function handler(request, reply) {
       const projectId = request.query.project_id;
       const userId = getUserIdFromRequest(request);
-      const project = await getProject(projectId);
-
-      if (!project || project.creator_id !== userId) {
-        throw new BadRequestError(
-          "Project id either does not exist or you don't have access to it"
-        );
-      }
-
-      const sections = await getProjectSections(projectId);
+      const sections = await getProjectSections({ projectId, userId });
 
       reply.code(200).send(sections);
     }
