@@ -20,7 +20,8 @@ export async function updateSection(
    * 2. Check if it was archived
    *   - if yes, archive all section tasks
    *   - update section
-   * 3. Otherwise, just update the section
+   * 3. Check if it was unarchived
+   * 4. Otherwise, just update the section
    */
 
   if (
@@ -35,6 +36,14 @@ export async function updateSection(
       newProject.is_archived
     ) {
       throw new ConflictError("Cannot move section to the new project id");
+    }
+
+    if (sectionUpdates.is_archived === false && section.is_archived === true) {
+      if (newProject.is_archived) {
+        throw new ConflictError(
+          "Cannot unarchive section in an archived project"
+        );
+      }
     }
 
     return executeTransaction(async (trx) => {
@@ -55,6 +64,16 @@ async function updateSectionWithArchiving(
 ) {
   if (sectionUpdates.is_archived && !section.is_archived) {
     await archiveSectionTasks(section.id, trx);
+  }
+
+  if (sectionUpdates.is_archived === false && section.is_archived === true) {
+    // different `project_id` was handled before
+    const project = await getProjectFromDB(section.project_id);
+    if (project?.is_archived) {
+      throw new ConflictError(
+        "Cannot unarchive section in an archived project"
+      );
+    }
   }
 
   return updateSectionInDB(section.id, sectionUpdates, trx);
