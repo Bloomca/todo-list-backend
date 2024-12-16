@@ -86,3 +86,10 @@ export async function updateSectionInDB(
 
   return result.affectedRows !== 0;
 }
+
+export async function deleteProjectSectionsFromDB(
+  projectId: number,
+  trx: PoolConnection
+): Promise<void> {
+  await trx.execute("DELETE FROM sections WHERE project_id=?", [projectId]);
+}

@@ -4,6 +4,7 @@ import {
   deleteProjectTasks,
   archiveProjectTasks,
 } from "../../repositories/task";
+import { deleteProjectSectionsFromDB } from "../../repositories/section";
 import { deleteProject, updateProject } from "../../repositories/project";
 import { executeTransaction } from "../../db";
 
@@ -17,6 +18,7 @@ import { Project, ProjectUpdates } from "../../types/entities/project";
 export async function deleteProjectWithData(projectId: number) {
   await executeTransaction(async function deleteProjectAndData(trx) {
     await deleteProjectTasks(projectId, trx);
+    await deleteProjectSectionsFromDB(projectId, trx);
     await deleteProject(projectId, trx);
   });
 }
