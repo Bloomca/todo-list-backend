@@ -93,3 +93,13 @@ export async function deleteProjectSectionsFromDB(
 ): Promise<void> {
   await trx.execute("DELETE FROM sections WHERE project_id=?", [projectId]);
 }
+
+export async function archiveProjectSectionsInDB(
+  projectId: number,
+  trx: PoolConnection
+) {
+  await trx.execute("UPDATE sections SET is_archived=? WHERE project_id=?", [
+    true,
+    projectId,
+  ]);
+}

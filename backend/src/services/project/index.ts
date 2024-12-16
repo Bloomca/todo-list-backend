@@ -4,7 +4,10 @@ import {
   deleteProjectTasks,
   archiveProjectTasks,
 } from "../../repositories/task";
-import { deleteProjectSectionsFromDB } from "../../repositories/section";
+import {
+  deleteProjectSectionsFromDB,
+  archiveProjectSectionsInDB,
+} from "../../repositories/section";
 import { deleteProject, updateProject } from "../../repositories/project";
 import { executeTransaction } from "../../db";
 
@@ -35,6 +38,7 @@ export async function updateProjectWithData(
   if (!project.is_archived && projectUpdates.is_archived === true) {
     return executeTransaction(async function archiveProjectAndData(trx) {
       await archiveProjectTasks(project.id, trx);
+      await archiveProjectSectionsInDB(project.id, trx);
       return updateProject(project.id, projectUpdates, trx);
     });
   } else {
