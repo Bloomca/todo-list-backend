@@ -31,7 +31,7 @@ export async function createSectionInDB({
   return sections[0] as Section;
 }
 
-export async function getProjectSections(projectId: number) {
+export async function getProjectSectionsFromDB(projectId: number) {
   const [sections] = await pool.execute<RowDataPacket[]>(
     "SELECT * FROM sections WHERE project_id=?",
     [projectId]
@@ -55,7 +55,7 @@ export async function getSectionById(
   return sections[0] as Section;
 }
 
-export async function deleteSection(
+export async function deleteSectionFromDB(
   sectionId: number,
   trx?: PoolConnection
 ): Promise<void> {

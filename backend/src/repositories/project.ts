@@ -40,7 +40,9 @@ export async function getUserProjects(userId: number): Promise<Project[]> {
   return results as Project[];
 }
 
-export async function getProject(projectId: number): Promise<null | Project> {
+export async function getProjectFromDB(
+  projectId: number
+): Promise<null | Project> {
   const [results] = await pool.execute<RowDataPacket[]>(
     "SELECT * FROM projects WHERE id=?",
     [projectId]

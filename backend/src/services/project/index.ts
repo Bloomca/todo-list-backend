@@ -1,4 +1,4 @@
-import { getProject } from "../../repositories/project";
+import { getProjectFromDB } from "../../repositories/project";
 import { NotFoundError, ForbiddenError } from "../../errors/errors";
 import {
   deleteProjectTasks,
@@ -49,7 +49,7 @@ export async function updateProjectWithData(
  * This function will throw errors in case it is not available.
  */
 export async function getProjectAndVerify(projectId: number, userId: number) {
-  const project = await getProject(projectId);
+  const project = await getProjectFromDB(projectId);
 
   if (!project) {
     throw new NotFoundError();
