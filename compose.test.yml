@@ -8,7 +8,7 @@ services:
       - DB_HOST=mysql
       - DB_USER=user
       - DB_PASSWORD=password
-      - DB_NAME=myapp
+      - DB_NAME=todo_list_backend
       - DB_PORT=3306
       - REDIS_HOST=redis
       - REDIS_PORT=6379

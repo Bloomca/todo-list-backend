@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "buid": "tsc",
+    "build": "tsc",
     "test:integration": "vitest run"
   },
   "repository": {

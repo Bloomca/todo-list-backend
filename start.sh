@@ -46,7 +46,7 @@ case "$command" in
 esac
 
 # production start (will compile TS to JS and only start with production dependencies):
-# docker compose -f compose.yml -f compose.prod.yml up -d
+# docker compose -f compose.prod.yml up --build -d
 
 # To connect to the database:
 # docker compose exec mysql mysql -u user -ppassword myapp
