@@ -29,6 +29,7 @@ export async function createTaskInDB({
     is_archived: false,
     creator_id: userId,
   });
+
   const [results] = await pool.execute<ResultSetHeader>(query, params);
   const [tasks] = await pool.execute<RowDataPacket[]>(
     "SELECT * FROM tasks WHERE id=?",
@@ -73,6 +74,26 @@ export async function deleteProjectTasks(
   ]);
 }
 
+export async function deleteSectionTasks(
+  sectionId: number,
+  trx?: PoolConnection
+): Promise<void> {
+  await (trx || pool).execute("DELETE FROM tasks WHERE section_id=?", [
+    sectionId,
+  ]);
+}
+
+export async function moveSectionTasks(
+  sectionId: number,
+  newProjectId: number,
+  trx: PoolConnection
+) {
+  await trx.execute("UPDATE tasks SET project_id=? WHERE section_id=?", [
+    newProjectId,
+    sectionId,
+  ]);
+}
+
 export async function updateTaskInDB(
   taskId: number,
   taskUpdates: TaskUpdates
@@ -96,10 +117,20 @@ export async function updateTaskInDB(
 
 export async function archiveProjectTasks(
   projectId: number,
-  trx?: PoolConnection
+  trx: PoolConnection
 ) {
-  await (trx ?? pool).execute(
-    "UPDATE tasks SET is_archived=? WHERE project_id=?",
-    [true, projectId]
-  );
+  await trx.execute("UPDATE tasks SET is_archived=? WHERE project_id=?", [
+    true,
+    projectId,
+  ]);
+}
+
+export async function archiveSectionTasks(
+  sectionId: number,
+  trx: PoolConnection
+) {
+  await trx.execute("UPDATE tasks SET is_archived=? WHERE section_id=?", [
+    true,
+    sectionId,
+  ]);
 }

@@ -8,11 +8,7 @@ import {
   getProjectAndVerify,
   updateProjectWithData,
 } from "../services/project/index";
-import {
-  createProjectInDB,
-  getUserProjects,
-  updateProject,
-} from "../repositories/project";
+import { createProjectInDB, getUserProjects } from "../repositories/project";
 import {
   type CreateProjectQuery,
   CreateProjectQuerySchema,

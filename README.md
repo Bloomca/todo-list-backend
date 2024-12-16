@@ -45,7 +45,15 @@ All other endpoints require `Authorization: Bearer <TOKEN>` header.
 **Tasks**
 
 - POST `/tasks` -- create a new task. Accepts `project_id`, `name` and `description` fields
-- GET `/tasks?projectId=<PROJECT_ID`> -- get all project's tasks
+- GET `/tasks?projectId=<PROJECT_ID>` -- get all project's tasks
 - GET `/tasks/:taskID` -- get an individual task by ID
 - PUT `/tasks/:taskID` -- update a task
 - DELETE `/tasks/:taskID` -- delete a task
+
+**Sections**
+
+- POST `/section` -- create a new section. Expects `name` and `project_id` fields
+- GET `/sections?projectId=<PROJECT_ID>` -- get all project's sections
+- GET `/sections/:sectionId` -- get an individual section
+- DELETE `/sections/:sectionId` -- delete a section. It will delete all child tasks as well
+- PUT `/sections/:sectionId` -- update a section. Accepts `name`, `project_id` and `is_archived`. If `project_id` is changed, it will change all tasks as well; if it is archived, all tasks will be archived as well

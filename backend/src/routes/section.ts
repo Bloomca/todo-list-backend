@@ -1,51 +1,51 @@
 import { type FastifyInstance } from "fastify";
 import { Type, Static } from "@sinclair/typebox";
 
+import { createSectionInDB, getProjectSections } from "../repositories/section";
 import {
-  createTaskInDB,
-  getProjectTasks,
-  deleteTask,
-} from "../repositories/task";
-import { getTaskAndVerify, updateTask } from "../services/task";
+  getSectionAndVerify,
+  deleteSectionWithData,
+  updateSection,
+} from "../services/section";
 import { getProject } from "../repositories/project";
 import { getUserIdFromRequest } from "../middleware/auth";
 import { BadRequestError, NotFoundError } from "../errors/errors";
 import {
-  type CreateTaskQuery,
-  CreateTaskQuerySchema,
-  type GetTasksQuery,
-  GetTasksQuerySchema,
-  type UpdateTaskQuery,
-  UpdateTaskQuerySchema,
-} from "../types/queries/task";
+  type CreateSectionQuery,
+  CreateSectionQuerySchema,
+  type GetProjectSectionsQuery,
+  GetProjectSectionsQuerySchema,
+  type UpdateSectionQuery,
+  UpdateSectionQuerySchema,
+} from "../types/queries/section";
 import {
-  type CreateTaskResponse,
-  CreateTaskResponseSchema,
-  type GetTasksResponse,
-  GetTasksResponseSchema,
-  type GetTaskResponse,
-  GetTaskResponseSchema,
-} from "../types/responses/task";
+  type CreateSectionResponse,
+  CreateSectionResponseSchema,
+  type GetProjectSectionsResponse,
+  GetProjectSectionsResponseSchema,
+  type GetSectionResponse,
+  GetSectionResponseSchema,
+} from "../types/responses/section";
 
-export function addTaskRoutes(fastify: FastifyInstance) {
-  addTaskCreateRoute(fastify);
-  addTasksGetRoute(fastify);
-  addTaskGetRoute(fastify);
-  addTaskDeleteRoute(fastify);
-  addTaskUpdateRoute(fastify);
+export function addSectionRoutes(fastify: FastifyInstance) {
+  addSectionCreateRoute(fastify);
+  addSectionsGetRoute(fastify);
+  addSectionGetRoute(fastify);
+  addSectionDeleteRoute(fastify);
+  addSectionUpdateRoute(fastify);
 }
 
-function addTaskCreateRoute(fastify: FastifyInstance) {
+function addSectionCreateRoute(fastify: FastifyInstance) {
   fastify.post<{
-    Body: CreateTaskQuery;
-    Reply: { 201: CreateTaskResponse };
+    Body: CreateSectionQuery;
+    Reply: { 201: CreateSectionResponse };
   }>(
-    "/tasks",
+    "/sections",
     {
       schema: {
-        body: CreateTaskQuerySchema,
+        body: CreateSectionQuerySchema,
         response: {
-          201: CreateTaskResponseSchema,
+          201: CreateSectionResponseSchema,
         },
       },
     },
@@ -59,29 +59,27 @@ function addTaskCreateRoute(fastify: FastifyInstance) {
         );
       }
 
-      const task = await createTaskInDB({
+      const section = await createSectionInDB({
         project_id: request.body.project_id,
-        section_id: request.body.section_id,
         name: request.body.name,
-        description: request.body.description,
         userId,
       });
 
-      reply.code(201).send(task);
+      reply.code(201).send(section);
     }
   );
 }
 
-function addTasksGetRoute(fastify: FastifyInstance) {
+function addSectionsGetRoute(fastify: FastifyInstance) {
   fastify.get<{
-    Querystring: GetTasksQuery;
-    Reply: { 200: GetTasksResponse };
+    Querystring: GetProjectSectionsQuery;
+    Reply: { 200: GetProjectSectionsResponse };
   }>(
-    "/tasks",
+    "/sections",
     {
       schema: {
-        querystring: GetTasksQuerySchema,
-        response: { 200: GetTasksResponseSchema },
+        querystring: GetProjectSectionsQuerySchema,
+        response: { 200: GetProjectSectionsResponseSchema },
       },
     },
     async function handler(request, reply) {
@@ -95,89 +93,85 @@ function addTasksGetRoute(fastify: FastifyInstance) {
         );
       }
 
-      const tasks = await getProjectTasks(projectId);
+      const sections = await getProjectSections(projectId);
 
-      reply.code(200).send(tasks);
+      reply.code(200).send(sections);
     }
   );
 }
 
 const ParamsSchema = Type.Object({
-  taskId: Type.Number(),
+  sectionId: Type.Number(),
 });
 
 type Params = Static<typeof ParamsSchema>;
 
-function addTaskGetRoute(fastify: FastifyInstance) {
+function addSectionGetRoute(fastify: FastifyInstance) {
   fastify.get<{
     Params: Params;
-    Reply: { 200: GetTaskResponse };
+    Reply: { 200: GetSectionResponse };
   }>(
-    "/tasks/:taskId",
+    "/sections/:sectionId",
     {
       schema: {
         params: ParamsSchema,
-        response: { 200: GetTaskResponseSchema },
+        response: { 200: GetSectionResponseSchema },
       },
     },
     async function handler(request, reply) {
-      const taskId = request.params.taskId;
+      const sectionId = request.params.sectionId;
       const userId = getUserIdFromRequest(request);
-      const task = await getTaskAndVerify(taskId, userId);
+      const section = await getSectionAndVerify(sectionId, userId);
 
-      reply.code(200).send(task);
+      reply.code(200).send(section);
     }
   );
 }
 
-function addTaskDeleteRoute(fastify: FastifyInstance) {
+function addSectionDeleteRoute(fastify: FastifyInstance) {
   fastify.delete<{
     Params: Params;
     Reply: { 204: null };
   }>(
-    "/tasks/:taskId",
+    "/sections/:sectionId",
     { schema: { params: ParamsSchema, response: { 204: { type: "null" } } } },
     async function handler(request, reply) {
-      const taskId = request.params.taskId;
+      const sectionId = request.params.sectionId;
       const userId = getUserIdFromRequest(request);
-      await getTaskAndVerify(taskId, userId);
+      await getSectionAndVerify(sectionId, userId);
 
-      await deleteTask(taskId);
+      await deleteSectionWithData(sectionId);
 
       reply.code(204).send();
     }
   );
 }
 
-function addTaskUpdateRoute(fastify: FastifyInstance) {
+function addSectionUpdateRoute(fastify: FastifyInstance) {
   fastify.put<{
     Params: Params;
-    Body: UpdateTaskQuery;
+    Body: UpdateSectionQuery;
     Reply: { 204: null };
   }>(
-    "/tasks/:taskId",
+    "/sections/:sectionId",
     {
       schema: {
         params: ParamsSchema,
-        body: UpdateTaskQuerySchema,
+        body: UpdateSectionQuerySchema,
         response: { 204: { type: "null" } },
       },
     },
     async function handler(request, reply) {
       const userId = getUserIdFromRequest(request);
-      const taskId = request.params.taskId;
-      const task = await getTaskAndVerify(taskId, userId);
+      const sectionId = request.params.sectionId;
+      const section = await getSectionAndVerify(sectionId, userId);
 
       const isEmpty = Object.keys(request.body).length === 0;
       if (isEmpty) {
         throw new BadRequestError("No updated task fields");
       }
 
-      const wasUpdated = await updateTask({
-        task,
-        taskUpdates: request.body,
-        userId,
-      });
+      const wasUpdated = await updateSection(section, request.body, userId);
 
       if (!wasUpdated) {
         // this should be handled earlier, so just to be safe
