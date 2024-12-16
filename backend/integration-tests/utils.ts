@@ -41,17 +41,23 @@ export async function createTask({
   token,
   projectId,
   taskName,
+  sectionId = null,
 }: {
   api: ReturnType<typeof request>;
   token: string;
   projectId: number;
   taskName: string;
+  sectionId?: number | null;
 }) {
   const response = await api
     .post("/tasks")
     .set("Authorization", `Bearer ${token}`)
     .set("Content-Type", "application/json")
-    .send({ project_id: projectId, name: taskName })
+    .send({
+      project_id: projectId,
+      name: taskName,
+      section_id: sectionId,
+    })
     .expect(201);
 
   return response.body as Task;

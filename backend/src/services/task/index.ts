@@ -10,7 +10,7 @@ import type { Task, TaskUpdates } from "../../types/entities/task";
 import type { Project } from "../../types/entities/project";
 
 /**
- * Get project by projectId, and check that:
+ * Get task by taskId, and check that:
  *
  * 1. It exists
  * 2. User is the creator, so they have permissions to use it
