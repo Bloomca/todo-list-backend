@@ -11,20 +11,23 @@ export async function createProjectInDB({
   name,
   description = "",
   userId,
+  displayOrder,
 }: {
   name: string;
   description?: string;
   userId: number;
+  displayOrder?: number;
 }) {
   const { query, params } = prepareInsertQuery("projects", {
     name,
     description,
     creator_id: userId,
     is_archived: false,
+    display_order: displayOrder ?? 1,
   });
   const [results] = await pool.execute<ResultSetHeader>(query, params);
   const [projects] = await pool.execute<RowDataPacket[]>(
-    "SELECT id, name, description, is_archived, created_at, creator_id FROM projects WHERE id=?",
+    "SELECT * FROM projects WHERE id=?",
     [results.insertId]
   );
 

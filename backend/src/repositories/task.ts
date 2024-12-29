@@ -13,12 +13,14 @@ export async function createTaskInDB({
   name,
   description = "",
   userId,
+  display_order,
 }: {
   project_id: number;
   section_id?: number | null;
   name: string;
   description?: string;
   userId: number;
+  display_order?: number;
 }) {
   const { query, params } = prepareInsertQuery("tasks", {
     project_id,
@@ -28,6 +30,7 @@ export async function createTaskInDB({
     is_completed: false,
     is_archived: false,
     creator_id: userId,
+    display_order: display_order ?? 1,
   });
 
   const [results] = await pool.execute<ResultSetHeader>(query, params);

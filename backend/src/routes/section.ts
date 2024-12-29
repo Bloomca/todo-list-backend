@@ -54,6 +54,7 @@ function addSectionCreateRoute(fastify: FastifyInstance) {
         userId: getUserIdFromRequest(request),
         projectId: request.body.project_id,
         name: request.body.name,
+        displayOrder: request.body.display_order,
       });
 
       reply.code(201).send(section);

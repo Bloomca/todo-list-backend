@@ -53,6 +53,7 @@ function addProjectCreateRoute(fastify: FastifyInstance) {
         name: request.body.name,
         description: request.body.description,
         userId,
+        displayOrder: request.body.display_order,
       });
 
       reply.code(201).send(project);

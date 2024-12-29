@@ -88,6 +88,7 @@ function addTaskCreateRoute(fastify: FastifyInstance) {
         name: request.body.name,
         description: request.body.description,
         userId,
+        display_order: request.body.display_order,
       });
 
       reply.code(201).send(task);

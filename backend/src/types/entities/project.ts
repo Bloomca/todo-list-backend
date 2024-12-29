@@ -5,6 +5,7 @@ export const ProjectSchema = Type.Object({
   name: Type.String(),
   description: Type.Optional(Type.String()),
   is_archived: Type.Boolean(),
+  display_order: Type.Integer(),
   created_at: Type.String(),
   creator_id: Type.Number(),
 });
@@ -13,6 +14,7 @@ export const ProjectUpdatesSchema = Type.Object({
   name: Type.Optional(Type.String()),
   description: Type.Optional(Type.Optional(Type.String())),
   is_archived: Type.Optional(Type.Boolean()),
+  display_order: Type.Optional(Type.Integer({ minimum: 1 })),
 });
 
 export type Project = Static<typeof ProjectSchema>;

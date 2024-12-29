@@ -4,10 +4,12 @@ import { BadRequestError, ConflictError } from "../../errors/errors";
 
 export async function createSection({
   projectId,
+  displayOrder,
   userId,
   name,
 }: {
   projectId: number;
+  displayOrder?: number;
   userId: number;
   name: string;
 }) {
@@ -27,5 +29,6 @@ export async function createSection({
     project_id: projectId,
     name,
     userId,
+    display_order: displayOrder ?? 1,
   });
 }

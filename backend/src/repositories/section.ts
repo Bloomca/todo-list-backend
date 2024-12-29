@@ -11,16 +11,19 @@ export async function createSectionInDB({
   project_id,
   name,
   userId,
+  display_order,
 }: {
   project_id: number;
   name: string;
   userId: number;
+  display_order: number;
 }) {
   const { query, params } = prepareInsertQuery("sections", {
     project_id,
     name,
     is_archived: false,
     creator_id: userId,
+    display_order,
   });
   const [results] = await pool.execute<ResultSetHeader>(query, params);
   const [sections] = await pool.execute<RowDataPacket[]>(

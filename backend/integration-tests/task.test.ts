@@ -17,21 +17,25 @@ describe("tasks tests", () => {
       token,
       projectId: project.id,
       taskName: "First task",
+      display_order: 1,
     });
 
     expect(task1.name).toBe("First task");
     expect(task1.project_id).toBe(project.id);
     expect(task1.section_id).toBe(null);
+    expect(task1.display_order).toBe(1);
 
     const task2 = await createTask({
       token,
       projectId: project.id,
       taskName: "Second task",
+      display_order: 3,
     });
 
     expect(task2.name).toBe("Second task");
     expect(task2.project_id).toBe(project.id);
     expect(task2.section_id).toBe(null);
+    expect(task2.display_order).toBe(3);
 
     logMessage("getting all tasks");
     const allTasksResponse = await api
@@ -79,6 +83,7 @@ describe("tasks tests", () => {
         name: "Updated task name",
         description: "New description",
         is_archived: true,
+        display_order: 4,
       })
       .expect(204);
 
@@ -89,6 +94,7 @@ describe("tasks tests", () => {
     expect(updatedTaskResponse.body.name).toBe("Updated task name");
     expect(updatedTaskResponse.body.description).toBe("New description");
     expect(updatedTaskResponse.body.is_archived).toBe(true);
+    expect(updatedTaskResponse.body.display_order).toBe(4);
   });
 });
 
@@ -96,16 +102,18 @@ async function createTask({
   token,
   projectId,
   taskName,
+  display_order,
 }: {
   token: string;
   projectId: number;
   taskName: string;
+  display_order: number;
 }) {
   const response = await api
     .post("/tasks")
     .set("Authorization", `Bearer ${token}`)
     .set("Content-Type", "application/json")
-    .send({ project_id: projectId, name: taskName })
+    .send({ project_id: projectId, name: taskName, display_order })
     .expect(201);
 
   return response.body as Task;

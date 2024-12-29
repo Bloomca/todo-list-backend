@@ -1,9 +1,21 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import mysql from "mysql2/promise";
 
-import { pool } from "./db";
+import { dbConfig } from "./db";
 
 import type { RowDataPacket } from "mysql2/promise";
+
+/**
+ * This should not be used for the regular application, so we
+ * create a separate connection pool just for migrations.
+ */
+const configWithMultipleStatements: mysql.PoolOptions = {
+  ...dbConfig,
+  multipleStatements: true,
+};
+
+const pool = mysql.createPool(configWithMultipleStatements);
 
 export async function applyMigrations() {
   try {
