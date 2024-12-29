@@ -17,19 +17,23 @@ describe("sections tests", () => {
       token,
       projectId: project.id,
       sectionName: "First section",
+      display_order: 1,
     });
 
     expect(section1.name).toBe("First section");
     expect(section1.project_id).toBe(project.id);
+    expect(section1.display_order).toBe(1);
 
     const section2 = await createSection({
       token,
       projectId: project.id,
       sectionName: "Second section",
+      display_order: 3,
     });
 
     expect(section2.name).toBe("Second section");
     expect(section2.project_id).toBe(project.id);
+    expect(section2.display_order).toBe(3);
 
     logMessage("getting all sections");
     const allSectionsResponse = await api
@@ -97,6 +101,7 @@ describe("sections tests", () => {
       .send({
         name: "Updated section name",
         is_archived: true,
+        display_order: 5,
       })
       .expect(204);
 
@@ -106,6 +111,7 @@ describe("sections tests", () => {
 
     expect(updatedSectionResponse.body.name).toBe("Updated section name");
     expect(updatedSectionResponse.body.is_archived).toBe(true);
+    expect(updatedSectionResponse.body.display_order).toBe(5);
 
     const updatedTaskResponse = await api
       .get(`/tasks/${secondTask.id}`)
@@ -120,16 +126,18 @@ async function createSection({
   token,
   projectId,
   sectionName,
+  display_order,
 }: {
   token: string;
   projectId: number;
   sectionName: string;
+  display_order: number;
 }) {
   const response = await api
     .post("/sections")
     .set("Authorization", `Bearer ${token}`)
     .set("Content-Type", "application/json")
-    .send({ project_id: projectId, name: sectionName })
+    .send({ project_id: projectId, name: sectionName, display_order })
     .expect(201);
 
   return response.body as Section;

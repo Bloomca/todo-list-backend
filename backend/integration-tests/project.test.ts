@@ -12,9 +12,9 @@ describe("project tests", () => {
     const token = await registerUser(api);
 
     logMessage("can create projects");
-    const project1 = await createProject(token, "My project");
-    const project2 = await createProject(token, "Movies");
-    const project3 = await createProject(token, "Books");
+    const project1 = await createProject(token, "My project", 1);
+    const project2 = await createProject(token, "Movies", 3);
+    const project3 = await createProject(token, "Books", 2);
 
     logMessage("can get all projects");
     const projectsResponse = await api
@@ -33,6 +33,7 @@ describe("project tests", () => {
       .expect(200);
 
     expect(projectResponse.body).toEqual(project2);
+    expect(projectResponse.body.display_order).toEqual(3);
 
     logMessage("can delete projects");
     /**
@@ -78,6 +79,9 @@ describe("project tests", () => {
         name: "Updated project name",
         description: "New description",
         is_archived: true,
+        // this number is not checked on the server, just that it is positive
+        // clients manage it
+        display_order: 5,
       })
       .expect(204);
 
@@ -88,6 +92,7 @@ describe("project tests", () => {
     expect(updatedProjectResponse.body.name).toBe("Updated project name");
     expect(updatedProjectResponse.body.description).toBe("New description");
     expect(updatedProjectResponse.body.is_archived).toBe(true);
+    expect(updatedProjectResponse.body.display_order).toBe(5);
 
     const updatedTask = await api
       .get(`/tasks/${secondTask.id}`)
@@ -100,13 +105,14 @@ describe("project tests", () => {
 
 async function createProject(
   token: string,
-  projectName: string
+  projectName: string,
+  display_order: number
 ): Promise<Project> {
   const response = await api
     .post("/projects")
     .set("Authorization", `Bearer ${token}`)
     .set("Content-Type", "application/json")
-    .send({ name: projectName })
+    .send({ name: projectName, display_order })
     .expect(201);
 
   expect(response.body).toHaveProperty("name");

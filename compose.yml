@@ -11,7 +11,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/db/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
-      - ./backend/db/02-init.sh:/docker-entrypoint-initdb.d/02-init.sh
 
   redis:
     image: redis:alpine
