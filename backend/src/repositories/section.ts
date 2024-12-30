@@ -18,10 +18,10 @@ export async function createSectionInDB({
   userId: number;
   display_order: number;
 }) {
-  const { query, params } = prepareInsertQuery("sections", {
+  const { query, params } = prepareInsertQuery<Partial<Section>>("sections", {
     project_id,
     name,
-    is_archived: false,
+    archived_at: null,
     creator_id: userId,
     display_order,
   });
@@ -70,12 +70,19 @@ export async function updateSectionInDB(
   sectionUpdates: SectionUpdates,
   trx?: PoolConnection
 ): Promise<boolean> {
+  const { is_archived, ...regularUpdates } = sectionUpdates;
   // Build the SET part of query and params array
-  const setClause = Object.keys(sectionUpdates)
-    .map((key) => `${key} = ?`)
-    .join(", ");
+  const setClauseParts = Object.keys(regularUpdates).map((key) => `${key} = ?`);
+
+  if (is_archived !== undefined) {
+    setClauseParts.push(
+      `archived_at = ${is_archived ? "CURRENT_TIMESTAMP()" : "NULL"}`
+    );
+  }
+
+  const setClause = setClauseParts.join(", ");
   const params = [
-    ...Object.values(sectionUpdates).map((value) => value),
+    ...Object.values(regularUpdates).map((value) => value),
     sectionId,
   ];
 
@@ -95,14 +102,4 @@ export async function deleteProjectSectionsFromDB(
   trx: PoolConnection
 ): Promise<void> {
   await trx.execute("DELETE FROM sections WHERE project_id=?", [projectId]);
-}
-
-export async function archiveProjectSectionsInDB(
-  projectId: number,
-  trx: PoolConnection
-) {
-  await trx.execute("UPDATE sections SET is_archived=? WHERE project_id=?", [
-    true,
-    projectId,
-  ]);
 }

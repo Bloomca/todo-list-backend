@@ -86,14 +86,6 @@ describe("sections tests", () => {
       .expect(404);
 
     logMessage("can update sections");
-    // create a task to make sure it is archived as well
-    const secondTask = await createTask({
-      api,
-      token,
-      projectId: project.id,
-      sectionId: section1.id,
-      taskName: "first task",
-    });
     await api
       .put(`/sections/${section1.id}`)
       .set("Authorization", `Bearer ${token}`)
@@ -110,15 +102,8 @@ describe("sections tests", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(updatedSectionResponse.body.name).toBe("Updated section name");
-    expect(updatedSectionResponse.body.is_archived).toBe(true);
+    expect(typeof updatedSectionResponse.body.archived_at).toBe("string");
     expect(updatedSectionResponse.body.display_order).toBe(5);
-
-    const updatedTaskResponse = await api
-      .get(`/tasks/${secondTask.id}`)
-      .set("Authorization", `Bearer ${token}`)
-      .expect(200);
-
-    expect(updatedTaskResponse.body.is_archived).toBe(true);
   });
 });
 

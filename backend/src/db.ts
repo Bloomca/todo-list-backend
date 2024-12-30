@@ -16,9 +16,9 @@ export const dbConfig: mysql.PoolOptions = {
 // Create a connection pool
 export const pool = mysql.createPool(dbConfig);
 
-export function prepareInsertQuery(
+export function prepareInsertQuery<T extends Record<string, any>>(
   tableName: string,
-  values: Record<string, any>
+  values: T
 ) {
   const { names, params } = Object.entries(values).reduce<{
     names: string[];

@@ -82,7 +82,6 @@ describe("tasks tests", () => {
       .send({
         name: "Updated task name",
         description: "New description",
-        is_archived: true,
         display_order: 4,
       })
       .expect(204);
@@ -93,7 +92,6 @@ describe("tasks tests", () => {
 
     expect(updatedTaskResponse.body.name).toBe("Updated task name");
     expect(updatedTaskResponse.body.description).toBe("New description");
-    expect(updatedTaskResponse.body.is_archived).toBe(true);
     expect(updatedTaskResponse.body.display_order).toBe(4);
   });
 });

@@ -18,11 +18,11 @@ export async function createProjectInDB({
   userId: number;
   displayOrder?: number;
 }) {
-  const { query, params } = prepareInsertQuery("projects", {
+  const { query, params } = prepareInsertQuery<Partial<Project>>("projects", {
     name,
     description,
     creator_id: userId,
-    is_archived: false,
+    archived_at: null,
     display_order: displayOrder ?? 1,
   });
   const [results] = await pool.execute<ResultSetHeader>(query, params);
@@ -65,17 +65,24 @@ export async function deleteProject(
   await (trx ?? pool).execute("DELETE FROM projects where id=?", [projectId]);
 }
 
-export async function updateProject(
+export async function updateProjectInDB(
   projectId: number,
   projectUpdates: ProjectUpdates,
   trx?: PoolConnection
 ): Promise<boolean> {
+  const { is_archived, ...regularUpdates } = projectUpdates;
   // Build the SET part of query and params array
-  const setClause = Object.keys(projectUpdates)
-    .map((key) => `${key} = ?`)
-    .join(", ");
+  const setClauseParts = Object.keys(regularUpdates).map((key) => `${key} = ?`);
+
+  if (is_archived !== undefined) {
+    setClauseParts.push(
+      `archived_at = ${is_archived ? "CURRENT_TIMESTAMP()" : "NULL"}`
+    );
+  }
+
+  const setClause = setClauseParts.join(", ");
   const params = [
-    ...Object.values(projectUpdates).map((value) => value),
+    ...Object.values(regularUpdates).map((value) => value),
     projectId,
   ];
 
