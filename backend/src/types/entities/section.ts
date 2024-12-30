@@ -4,7 +4,7 @@ export const SectionSchema = Type.Object({
   id: Type.Number(),
   project_id: Type.Number(),
   name: Type.String(),
-  is_archived: Type.Boolean(),
+  archived_at: Type.Union([Type.String(), Type.Null()]),
   display_order: Type.Number(),
   created_at: Type.String(),
   creator_id: Type.Number(),

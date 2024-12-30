@@ -5,7 +5,7 @@ import { getUserIdFromRequest } from "../../middleware/auth";
 import { NotFoundError, BadRequestError } from "../../errors/errors";
 import {
   getProjectAndVerify,
-  updateProjectWithData,
+  updateProject,
 } from "../../services/project/index";
 import {
   type UpdateProjectQuery,
@@ -40,7 +40,7 @@ export function addProjectUpdateRoute(fastify: FastifyInstance) {
       if (isEmpty) {
         throw new BadRequestError("No updated project fields");
       }
-      const wasUpdated = await updateProjectWithData(project, request.body);
+      const wasUpdated = await updateProject(project, request.body);
 
       if (!wasUpdated) {
         // this should be handled earlier, so just to be safe

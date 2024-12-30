@@ -38,7 +38,7 @@ export function addTaskCreateRoute(fastify: FastifyInstance) {
         );
       }
 
-      if (project.is_archived) {
+      if (project.archived_at !== null) {
         throw new ConflictError("Cannot create tasks in archived projects");
       }
 
@@ -51,7 +51,7 @@ export function addTaskCreateRoute(fastify: FastifyInstance) {
           );
         }
 
-        if (section.is_archived) {
+        if (section.archived_at !== null) {
           throw new ConflictError("Cannot create tasks in archived sections");
         }
       }

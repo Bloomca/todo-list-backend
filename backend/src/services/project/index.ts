@@ -1,14 +1,8 @@
 import { getProjectFromDB } from "../../repositories/project";
 import { NotFoundError, ForbiddenError } from "../../errors/errors";
-import {
-  deleteProjectTasks,
-  archiveProjectTasks,
-} from "../../repositories/task";
-import {
-  deleteProjectSectionsFromDB,
-  archiveProjectSectionsInDB,
-} from "../../repositories/section";
-import { deleteProject, updateProject } from "../../repositories/project";
+import { deleteProjectTasks } from "../../repositories/task";
+import { deleteProjectSectionsFromDB } from "../../repositories/section";
+import { deleteProject, updateProjectInDB } from "../../repositories/project";
 import { executeTransaction } from "../../db";
 
 import { Project, ProjectUpdates } from "../../types/entities/project";
@@ -26,24 +20,11 @@ export async function deleteProjectWithData(projectId: number) {
   });
 }
 
-/**
- * Update project and correctly archive all associated entities
- * if the project is being archived.
- */
-export async function updateProjectWithData(
+export async function updateProject(
   project: Project,
   projectUpdates: ProjectUpdates
 ): Promise<boolean> {
-  // when we are archiving a project, we need to archive its tasks
-  if (!project.is_archived && projectUpdates.is_archived === true) {
-    return executeTransaction(async function archiveProjectAndData(trx) {
-      await archiveProjectTasks(project.id, trx);
-      await archiveProjectSectionsInDB(project.id, trx);
-      return updateProject(project.id, projectUpdates, trx);
-    });
-  } else {
-    return updateProject(project.id, projectUpdates);
-  }
+  return updateProjectInDB(project.id, projectUpdates);
 }
 
 /**

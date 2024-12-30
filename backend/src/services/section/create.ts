@@ -21,7 +21,7 @@ export async function createSection({
     );
   }
 
-  if (project.is_archived) {
+  if (project.archived_at !== null) {
     throw new ConflictError("Cannot create section in archived projects");
   }
 

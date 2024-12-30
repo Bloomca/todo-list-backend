@@ -22,13 +22,12 @@ export async function createTaskInDB({
   userId: number;
   display_order?: number;
 }) {
-  const { query, params } = prepareInsertQuery("tasks", {
+  const { query, params } = prepareInsertQuery<Partial<Task>>("tasks", {
     project_id,
     section_id,
     name,
     description,
     is_completed: false,
-    is_archived: false,
     creator_id: userId,
     display_order: display_order ?? 1,
   });
@@ -116,24 +115,4 @@ export async function updateTaskInDB(
   const [result] = await pool.execute<ResultSetHeader>(query, params);
 
   return result.affectedRows !== 0;
-}
-
-export async function archiveProjectTasks(
-  projectId: number,
-  trx: PoolConnection
-) {
-  await trx.execute("UPDATE tasks SET is_archived=? WHERE project_id=?", [
-    true,
-    projectId,
-  ]);
-}
-
-export async function archiveSectionTasks(
-  sectionId: number,
-  trx: PoolConnection
-) {
-  await trx.execute("UPDATE tasks SET is_archived=? WHERE section_id=?", [
-    true,
-    sectionId,
-  ]);
 }

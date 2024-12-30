@@ -61,16 +61,6 @@ describe("project tests", () => {
       .expect(404);
 
     logMessage("can update projects");
-    /**
-     * We create a task first, so that it will be archived as well.
-     */
-    const secondTask = await createTask({
-      api,
-      token,
-      projectId: project2.id,
-      taskName: "task to be archived",
-    });
-    expect(secondTask.is_archived).toBe(false);
     await api
       .put(`/projects/${project2.id}`)
       .set("Authorization", `Bearer ${token}`)
@@ -91,15 +81,8 @@ describe("project tests", () => {
 
     expect(updatedProjectResponse.body.name).toBe("Updated project name");
     expect(updatedProjectResponse.body.description).toBe("New description");
-    expect(updatedProjectResponse.body.is_archived).toBe(true);
+    expect(typeof updatedProjectResponse.body.archived_at).toBe("string");
     expect(updatedProjectResponse.body.display_order).toBe(5);
-
-    const updatedTask = await api
-      .get(`/tasks/${secondTask.id}`)
-      .set("Authorization", `Bearer ${token}`)
-      .expect(200);
-
-    expect(updatedTask.body.is_archived).toBe(true);
   });
 });
 

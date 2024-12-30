@@ -1,5 +1,5 @@
 import { updateSectionInDB } from "../../repositories/section";
-import { moveSectionTasks, archiveSectionTasks } from "../../repositories/task";
+import { moveSectionTasks } from "../../repositories/task";
 import { getProjectFromDB } from "../../repositories/project";
 import { ConflictError } from "../../errors/errors";
 import { executeTransaction } from "../../db";
@@ -15,13 +15,12 @@ export async function updateSection(
   /**
    * 1. Check if project_id changed
    *   - if yes, check the new project existence and permissions
+   *   - check that the new project is not archived
    *   - change project_id for all section tasks
    *   - update section
-   * 2. Check if it was archived
-   *   - if yes, archive all section tasks
-   *   - update section
-   * 3. Check if it was unarchived
-   * 4. Otherwise, just update the section
+   * 2. Check if the archiving status is being changed
+   *   - check that the current project is not archived
+   * 3. Otherwise, just update the section
    */
 
   if (
@@ -33,13 +32,16 @@ export async function updateSection(
     if (
       !newProject ||
       newProject.creator_id !== userId ||
-      newProject.is_archived
+      newProject.archived_at !== null
     ) {
       throw new ConflictError("Cannot move section to the new project id");
     }
 
-    if (sectionUpdates.is_archived === false && section.is_archived === true) {
-      if (newProject.is_archived) {
+    if (
+      sectionUpdates.is_archived !== undefined &&
+      sectionUpdates.is_archived !== Boolean(section.archived_at)
+    ) {
+      if (newProject.archived_at !== null) {
         throw new ConflictError(
           "Cannot unarchive section in an archived project"
         );
@@ -62,14 +64,10 @@ async function updateSectionWithArchiving(
   sectionUpdates: SectionUpdates,
   trx: PoolConnection
 ) {
-  if (sectionUpdates.is_archived && !section.is_archived) {
-    await archiveSectionTasks(section.id, trx);
-  }
-
-  if (sectionUpdates.is_archived === false && section.is_archived === true) {
+  if (sectionUpdates.is_archived === false && section.archived_at !== null) {
     // different `project_id` was handled before
     const project = await getProjectFromDB(section.project_id);
-    if (project?.is_archived) {
+    if (project?.archived_at !== null) {
       throw new ConflictError(
         "Cannot unarchive section in an archived project"
       );
