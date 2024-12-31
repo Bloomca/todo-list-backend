@@ -93,6 +93,22 @@ describe("tasks tests", () => {
     expect(updatedTaskResponse.body.name).toBe("Updated task name");
     expect(updatedTaskResponse.body.description).toBe("New description");
     expect(updatedTaskResponse.body.display_order).toBe(4);
+
+    logMessage("can complete tasks");
+    await api
+      .put(`/tasks/${task1.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .set("Content-Type", "application/json")
+      .send({
+        is_completed: true,
+      })
+      .expect(204);
+
+    const updatedTaskResponse2 = await api
+      .get(`/tasks/${task1.id}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(typeof updatedTaskResponse2.body.completed_at).toBe("string");
   });
 });
 

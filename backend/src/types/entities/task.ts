@@ -6,7 +6,7 @@ export const TaskSchema = Type.Object({
   section_id: Type.Union([Type.Number(), Type.Null()]),
   name: Type.String(),
   description: Type.Optional(Type.String()),
-  is_completed: Type.Boolean(),
+  completed_at: Type.Union([Type.String(), Type.Null()]),
   display_order: Type.Number(),
   created_at: Type.String(),
   creator_id: Type.Number(),
