@@ -27,7 +27,7 @@ export async function createTaskInDB({
     section_id,
     name,
     description,
-    is_completed: false,
+    completed_at: null,
     creator_id: userId,
     display_order: display_order ?? 1,
   });
@@ -100,11 +100,21 @@ export async function updateTaskInDB(
   taskId: number,
   taskUpdates: TaskUpdates
 ): Promise<boolean> {
+  const { is_completed, ...regularUpdates } = taskUpdates;
   // Build the SET part of query and params array
-  const setClause = Object.keys(taskUpdates)
-    .map((key) => `${key} = ?`)
-    .join(", ");
-  const params = [...Object.values(taskUpdates).map((value) => value), taskId];
+  const setClauseParts = Object.keys(regularUpdates).map((key) => `${key} = ?`);
+
+  if (is_completed !== undefined) {
+    setClauseParts.push(
+      `completed_at = ${is_completed ? "CURRENT_TIMESTAMP()" : "NULL"}`
+    );
+  }
+
+  const setClause = setClauseParts.join(", ");
+  const params = [
+    ...Object.values(regularUpdates).map((value) => value),
+    taskId,
+  ];
 
   const query = `
     UPDATE tasks 
